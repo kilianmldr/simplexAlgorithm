@@ -45,115 +45,88 @@ int main()
 
     //Eingabe der Daten durch den User
     double h;
-    for (int i = 0; i < anzahlZeilen; i++)
-    {
-        //durchlufen der Zeilen des Tableaus
+    for (int i = 0; i < anzahlZeilen; i++) {
+        //Durchlaufen der Zeilen des Tableaus
         printf("\n");
-        if (i < anzahlKGR)
-        {
+        if (i < anzahlKGR) {
             printf("Geben Sie eine '<='-Restriktion ein: \n");
         }
-        else if ((i >= anzahlKGR) && (i < anzahlRestriktionen))
-        {
+        else if ((i >= anzahlKGR) && (i < anzahlRestriktionen)) {
             printf("Geben Sie eine '>='-Restriktion ein: \n");
         }
-        else
-        {
+        else {
             printf("Geben Sie die Zielfunktion ein: \n");
         }
-        for (int j = 0; j < anzahlSpalten; j++)
-        {
-            //durchlaufen der Spalten des Tableaus
-            if (i < anzahlRestriktionen)
-            {
+        for (int j = 0; j < anzahlSpalten; j++) {
+            //Durchlaufen der Spalten des Tableaus
+            if (i < anzahlRestriktionen) {
                 //Restriktionszeilen
-                if (i < anzahlKGR)
-                {
+                if (i < anzahlKGR) {
                     //<=
-                    if (j < anzahlProdukte)
-                    {
+                    if (j < anzahlProdukte) {
                         //Produkte
-                        if (j != 0)
-                        {
+                        if (j != 0) {
                             printf("+");
                         }
                         printf("\t%c * ", g_alphabet[j]);
                         scanf("%lf", &h);
                         tableau[i][j] = h;
-
                     } //if (j < anzahlProdukte)
-                    else if (j == (anzahlRestriktionen+anzahlProdukte))
-                    {
+                    else if (j == (anzahlRestriktionen+anzahlProdukte)) {
                         //bi-Zeile
                         printf("<=\t");
                         scanf("%lf", &h);
                         tableau[i][j] = h;
                     } //else if (j == (anzahlRestriktionen+anzahlProdukte))
-                    else
-                    {
+                    else {
                         //Schlupfvariablen
-                        if ((anzahlProdukte+i) == j)
-                        {
+                        if ((anzahlProdukte+i) == j) {
                             tableau[i][j] = 1;
                         }
-                        else
-                        {
+                        else {
                             tableau[i][j] = 0;
                         }
                     } //else
-
                 } //if (i < anzahlKGR)
-                else
-                {
+                else {
                     //>=
-                    if (j < anzahlProdukte)
-                    {
+                    if (j < anzahlProdukte) {
                         //Produkte
-                        if (j != 0)
-                        {
+                        if (j != 0) {
                             printf("+");
                         }
                         printf("\t%c * ", g_alphabet[j]);
                         scanf("%lf", &h);
                         tableau[i][j] = h*(-1);
                     } //if (j < anzahlProdukte)
-                    else if (j == (anzahlRestriktionen+anzahlProdukte))
-                    {
+                    else if (j == (anzahlRestriktionen+anzahlProdukte)) {
                         //bi-Zeile
                         printf(">=\t");
                         scanf("%lf", &h);
                         tableau[i][j] = h*(-1);
                     } //else if (j == (anzahlRestriktionen+anzahlProdukte))
-                    else
-                    {
+                    else {
                         //Schlupfvariablen
-                        if ((anzahlProdukte+i) == j)
-                        {
+                        if ((anzahlProdukte+i) == j) {
                             tableau[i][j] = 1;
                         }
-                        else
-                        {
+                        else {
                             tableau[i][j] = 0;
                         }
                     } //else
                 } //else
-
             } //if (i < anzahlRestriktionen)
-            else
-            {
+            else {
                 //F-Zeile
-                if (j < anzahlProdukte)
-                {
-                    if (j != 0)
-                    {
+                if (j < anzahlProdukte) {
+                    if (j != 0) {
                         printf("+");
                     }
                     printf("\t%c * ", g_alphabet[j]);
                     scanf("%lf", &h);
                     tableau[i][j] = h*(-1);
                 } //if (j < anzahlProdukte)
-                else
-                {
+                else {
                     tableau[i][j] = 0;
                 } //else
             } //else
@@ -161,34 +134,34 @@ int main()
     } //for (int i = 0; i < anzahlZeilen; i++)
     printf("\n");
 
-    //Ausgabe der Eingabe in Form des ersten Tableaus
+    //Ausgabe der Eingabe in Form des ersten Simplex-Tableaus
     ausgabeTableau(anzahlSpalten, anzahlZeilen, *tableau);
 
     //Wahl des Algorithmus
     statusAlgorithmus = 0;
     for (int i = 0; i < anzahlZeilen; i++) {
-        if (tableau[i][anzahlRestriktionen+anzahlProdukte] < 0){
-            //keine zulessige Basisloesung
+        if (tableau[i][anzahlRestriktionen+anzahlProdukte] < 0) {
+            //keine zulessige Basisloesung => dualer Simplex-Algorithmus
             statusAlgorithmus = 1;
             break;
         }
     }
+
+    //Aufruf der entsprechenden Funktion zur Ausfuehrung des Simplex-Algorithmus
     double h_result = 0;
     double h_lsg;
     if (statusAlgorithmus == 0) {
         //primaler Algorithmus
         printf("Dieses lineare Optimierungsproblem wird mit dem primalen Simplex-Algorithmus geloest.\n");
         h_result = primalerSimplex(anzahlRestriktionen, anzahlProdukte, *tableau);
-        if (h_result == -1)
-        {
+        if (h_result == -1){
             printf("Fuer das lineare Optimierungsproblem konnte keine optimale Loesung gefunden werden.\n");
-        } //if (h_result == -1)
-        else if (h_result == 1)
-        {
+        }
+        else if (h_result == 1) {
             h_lsg = tableau[anzahlRestriktionen][anzahlRestriktionen+anzahlProdukte];
             printf("Die optimale Loesung lautet: %lf\n\n", h_lsg);
             ausgabeTableau(anzahlSpalten, anzahlZeilen, *tableau);
-        } //else if (h_result == 1)
+        }
     } //if (statusAlgorithmus == 0)
     else if (statusAlgorithmus == 1) {
         //dualer Algorithmus
@@ -198,26 +171,24 @@ int main()
             printf("Fuer das lineare Optimierungsproblem konnte keine zulaessige Loesung gefunden werden.\n");
         }
         else if (h_result == 1) {
-            //anschliessend primaler Algorithmus
+            //wenn zulaessige Loesung gefunden, fuehre primalen Simplex aus, um optimale Loesung zu fiden
             h_result = primalerSimplex(anzahlRestriktionen, anzahlProdukte, *tableau);
-            if (h_result == -1)
-            {
+            if (h_result == -1) {
                 printf("Fuer das lineare Optimierungsproblem konnte keine optimale Loesung gefunden werden.\n");
-            } //if (h_result == -1)
-            else if (h_result == 1)
-            {
+            }
+            else if (h_result == 1) {
                 h_lsg = tableau[anzahlRestriktionen][anzahlRestriktionen+anzahlProdukte];
                 printf("Die optimale Loesung lautet: %lf\n\n", h_lsg);
                 ausgabeTableau(anzahlSpalten, anzahlZeilen, *tableau);
             } //else if (h_result == 1)
         }
     }
-
 	return 0;
 }
 
+
 /**
- * Ausgabe eines Tableaus
+ * Zeilenweise Ausgabe eines Tableaus
  *
  * @param l_anzahlSpalten Anzahl der Spalten des Tableaus
  * @param l_anzahlZeilen Anzahl der Zeilen des Tableaus
@@ -225,10 +196,10 @@ int main()
  */
 void ausgabeTableau(int l_anzahlSpalten, int l_anzahlZeilen, double* tableau)
 {
-    for (int i = 0; i < l_anzahlZeilen; i++)
-    {
-        for (int j = 0; j < l_anzahlSpalten; j++)
-        {
+    for (int i = 0; i < l_anzahlZeilen; i++) {
+        //Durchlaufen der Zeilen
+        for (int j = 0; j < l_anzahlSpalten; j++) {
+            //Durchlaufen der Spalten
             printf("%lf\t", tableau[j+i*l_anzahlSpalten]);
         }
         printf("\n");
@@ -236,8 +207,10 @@ void ausgabeTableau(int l_anzahlSpalten, int l_anzahlZeilen, double* tableau)
     printf("\n");
 }
 
+
 /**
- * Bilden eines Einheitsvektors bei gegebenenen Pivotelement
+ * Bilden eines Einheitsvektors bei gegebenenen Pivotelement 
+ * (Dritter Schritt des primalen/dualen Simplex-Algorithmus)
  *
  * @param tableau Zeiger auf zweidimensionales Array, welches das Tableau enth�lt
  * @param l_pivotSpalte Welche Spalte stellt die Pivotspalte dar
@@ -248,33 +221,30 @@ void ausgabeTableau(int l_anzahlSpalten, int l_anzahlZeilen, double* tableau)
 void bildeEinheitsvektor(double* tableau, int l_pivotSpalte, int l_pivotZeile, int l_anzahlZeilen, int l_anzahlSpalten)
 {
     //Pivotelement auf 1 bringen
-    //tableau[wunschSpalte + wunschZeile * anzahlSpalten]
     double l_pivotElement = tableau[l_anzahlSpalten*l_pivotZeile+l_pivotSpalte];
     double l_arrayPivotZeile[l_anzahlSpalten];
-    for (int i = 0; i < l_anzahlSpalten; i++)
-    {
+
+    for (int i = 0; i < l_anzahlSpalten; i++) {
         //Teile Pivotzeile durch Pivotelement, um Pivotelement auf 1 zu bringen
         tableau[l_anzahlSpalten*l_pivotZeile+i] /= l_pivotElement;
         l_arrayPivotZeile[i] = tableau[l_anzahlSpalten*l_pivotZeile+i];
     }
+
     //Alle anderen Zeilen auf 0 bringen
-    for (int i = 0; i < l_anzahlZeilen; i++)
-    {
+    for (int i = 0; i < l_anzahlZeilen; i++) {
         double l_faktor = tableau[i*l_anzahlSpalten+l_pivotSpalte]*(-1);
-        for (int j = 0; j < l_anzahlSpalten; j++)
-        {
-            if (i == l_pivotZeile)
-            {
+        for (int j = 0; j < l_anzahlSpalten; j++) {
+            if (i == l_pivotZeile) {
                 //Die Pivotzeile muss nicht nochmal bearbeitet werden
                 break;
             }
-            else
-            {
+            else {
                 tableau[j+i*l_anzahlSpalten] = tableau[j+i*l_anzahlSpalten] + l_faktor * l_arrayPivotZeile[j];
             }
         }
     }
 }
+
 
 /**
  * Anwendung des primalen Simplex-Algorithmus auf ein lineares Optimierungsproblem
@@ -284,7 +254,6 @@ void bildeEinheitsvektor(double* tableau, int l_pivotSpalte, int l_pivotZeile, i
  * @param l_tableau Zeiger auf zweidimensionales Array, welches das Tableau enthaelt
  * @return Entweder 1, wenn optimale Loesung gefunden wurde, oder -1, wenn keine optimale Loesung gefunden wurde
  */
- 
 double primalerSimplex(int l_anzahlRestriktionen, int l_anzahlProdukte, double* tableau)
 {
     int l_anzahlSpalten = l_anzahlRestriktionen+l_anzahlProdukte+1;
@@ -295,26 +264,21 @@ double primalerSimplex(int l_anzahlRestriktionen, int l_anzahlProdukte, double* 
     int l_pivotZeile = -1;
 
     //Wiederhole den primalen Simplex-Algorithmus solange, bis eine optimale Loesung gefunden wurde
-    while (l_run == 1)
-    {
+    while (l_run == 1) {
         //Schritt 1: Bestimmung der Pivotspalte
         l_lsg = 1;
         //wenn die F-Zeile nur nichtnegative Werte enthaelt, ist die Basisloesung optimal; ansonsten suche den kleinsten neg. Wert
-        for (int i = 0; i < l_anzahlSpalten; i++)
-        {
-            if ((tableau[i+l_anzahlRestriktionen*l_anzahlSpalten]) < 0)
-            {
+        for (int i = 0; i < l_anzahlSpalten; i++) {
+            if ((tableau[i+l_anzahlRestriktionen*l_anzahlSpalten]) < 0) {
                 //min. ein negativer Wert vorhanden
                 l_lsg = 0;
-                if ((tableau[i + l_anzahlRestriktionen * l_anzahlSpalten]) < (tableau[(l_pivotSpalte) + l_anzahlRestriktionen * l_anzahlSpalten]))
-                {
+                if ((tableau[i + l_anzahlRestriktionen * l_anzahlSpalten]) < (tableau[(l_pivotSpalte) + l_anzahlRestriktionen * l_anzahlSpalten])) {
                     //speichern des kleinsten negativen Wert
                     l_pivotSpalte = i;
                 }
             }
         }
-        if (l_lsg == 1)
-        {
+        if (l_lsg == 1) {
             //optimale Loesung gefunden, return der Basisloesung
             l_run = 0;
             return 1;
@@ -323,28 +287,26 @@ double primalerSimplex(int l_anzahlRestriktionen, int l_anzahlProdukte, double* 
         //Schritt 2: Bestimmung der Pivotzeile mittels Engpassbestimmung
         l_lsg = 1;
         double h_quotient = 0;
-        for (int i = 0; i < l_anzahlZeilen; i++)
-        {
-            if ((tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten] > 0) && (tableau[l_pivotSpalte+i*l_anzahlSpalten] > 0))
-            {
+        for (int i = 0; i < l_anzahlZeilen; i++) {
+            if ((tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten] > 0) && (tableau[l_pivotSpalte+i*l_anzahlSpalten] > 0)) {
                 //wenn bi-Wert > 0 & Wert in Pivotspalte > 0 => Engpassbestimmung
                 l_lsg = 0;
-                if ((h_quotient == 0) || (h_quotient > (tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten]/tableau[l_pivotSpalte+i*l_anzahlSpalten])))
-                {
+                if ((h_quotient == 0) || (h_quotient > (tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten]/tableau[l_pivotSpalte+i*l_anzahlSpalten]))) {
                     h_quotient = (tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten])/(tableau[l_pivotSpalte+i*l_anzahlSpalten]);
                     l_pivotZeile = i;
                 }
             }
         }
-        if (l_lsg == 1)
-        {
+        if (l_lsg == 1) {
             //Kann keine optimale Bedingung finden; kein Koeffizient >= 0
             l_run = 0;
             return -1;
         }
+
         bildeEinheitsvektor(tableau, l_pivotSpalte, l_pivotZeile, l_anzahlZeilen, l_anzahlSpalten);
     }
 }
+
 
 /**
  * Anwendung des dualen Simplex-Algorithmus auf ein lineares Optimierungsproblem
