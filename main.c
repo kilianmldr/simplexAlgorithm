@@ -258,47 +258,54 @@ double primalerSimplex(int l_anzahlRestriktionen, int l_anzahlProdukte, double* 
 {
     int l_anzahlSpalten = l_anzahlRestriktionen+l_anzahlProdukte+1;
     int l_anzahlZeilen = l_anzahlRestriktionen+1;
-    int l_lsg = 0;   //Hilfsvariable; boolean   
     int l_run = 1;   //Solange 1, wende primalen Simplex-Algorithmus an, bei 0: fertig oder Abbruch
     int l_pivotSpalte = -1;
     int l_pivotZeile = -1;
 
     //Wiederhole den primalen Simplex-Algorithmus solange, bis eine optimale Loesung gefunden wurde
     while (l_run == 1) {
+        l_pivotSpalte = -1;
+        l_pivotZeile = -1;
+
         //Schritt 1: Bestimmung der Pivotspalte
-        l_lsg = 1;
-        //wenn die F-Zeile nur nichtnegative Werte enthaelt, ist die Basisloesung optimal; ansonsten suche den kleinsten neg. Wert
         for (int i = 0; i < l_anzahlSpalten; i++) {
             if ((tableau[i+l_anzahlRestriktionen*l_anzahlSpalten]) < 0) {
                 //min. ein negativer Wert vorhanden
-                l_lsg = 0;
-                if ((tableau[i + l_anzahlRestriktionen * l_anzahlSpalten]) < (tableau[(l_pivotSpalte) + l_anzahlRestriktionen * l_anzahlSpalten])) {
-                    //speichern des kleinsten negativen Wert
+                if (l_pivotSpalte == -1) {
                     l_pivotSpalte = i;
+                }
+                else {
+                    if ((tableau[i + l_anzahlRestriktionen * l_anzahlSpalten]) < (tableau[(l_pivotSpalte) + l_anzahlRestriktionen * l_anzahlSpalten])) {
+                        //speichern des kleinsten negativen Wert
+                        l_pivotSpalte = i;
+                    }
                 }
             }
         }
-        if (l_lsg == 1) {
-            //optimale Loesung gefunden, return der Basisloesung
+        if (l_pivotSpalte == -1) {
+            //F-Zeile enthaelt nur nicht-negative Werte => optimale Loesung gefunden, return der Basisloesung
             l_run = 0;
             return 1;
         }
 
         //Schritt 2: Bestimmung der Pivotzeile mittels Engpassbestimmung
-        l_lsg = 1;
         double h_quotient = 0;
         for (int i = 0; i < l_anzahlZeilen; i++) {
             if ((tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten] > 0) && (tableau[l_pivotSpalte+i*l_anzahlSpalten] > 0)) {
                 //wenn bi-Wert > 0 & Wert in Pivotspalte > 0 => Engpassbestimmung
-                l_lsg = 0;
-                if ((h_quotient == 0) || (h_quotient > (tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten]/tableau[l_pivotSpalte+i*l_anzahlSpalten]))) {
-                    h_quotient = (tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten])/(tableau[l_pivotSpalte+i*l_anzahlSpalten]);
+                if (l_pivotZeile == -1) {
                     l_pivotZeile = i;
+                }
+                else {
+                    if ((h_quotient == 0) || (h_quotient > (tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten]/tableau[l_pivotSpalte+i*l_anzahlSpalten]))) {
+                        h_quotient = (tableau[(l_anzahlRestriktionen+l_anzahlProdukte)+i*l_anzahlSpalten])/(tableau[l_pivotSpalte+i*l_anzahlSpalten]);
+                        l_pivotZeile = i;
+                    }
                 }
             }
         }
-        if (l_lsg == 1) {
-            //Kann keine optimale Bedingung finden; kein Koeffizient >= 0
+        if (l_pivotZeile == -1) {
+            //kein Koeffizient in Pivotzeile >= 0 => es kann keine optimale Loesung gefunden werden
             l_run = 0;
             return -1;
         }
